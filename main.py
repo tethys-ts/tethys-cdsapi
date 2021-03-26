@@ -112,8 +112,8 @@ class Downloader(object):
 
         """
         ## Run checks
-        if isinstance(parameter, str):
-            raise TypeError('parameters must be astr.')
+        if not isinstance(parameter, str):
+            raise TypeError('parameter must be a str.')
 
         if isinstance(from_date, (str, pd.Timestamp)):
             from_date1 = pd.Timestamp(from_date) - pd.offsets.MonthBegin(0)
@@ -136,23 +136,26 @@ class Downloader(object):
             raise ValueError('product is not available.')
 
         ## Split dates into download chunks
-        dates1 = pd.date_range(from_date1, to_date1, freq='H')
-        dates2 = pd.DataFrame(1, index=dates1, columns=['val'])
-        dates2.index.name = 'year'
+        dates1 = pd.date_range(from_date1, to_date1, freq='11Y')
+        dates_min = (dates1 - pd.offsets.YearBegin(1)).year.tolist()
+        dates_max = (dates1[1:] - pd.offsets.YearEnd(1)).year.tolist()
+        dates_max = dates_max + [to_date1.year]
+        # dates2 = pd.DataFrame(1, index=dates1, columns=['val'])
+        # dates2.index.name = 'year'
 
         # lats = np.arange(bbox1[2], bbox1[0]+0.1, step=0.1)
         # lons = np.arange(bbox1[1], bbox1[3]+0.1, step=0.1)
 
         # base_len = len(lats) * len(lons)
 
-        dates2a = dates2.resample('Y').sum()
-        dates3 = (dates2a.cumsum()//100000).reset_index()
-        dates_grp = dates3.groupby('val')['year']
-        dates_min = (dates_grp.min() - pd.offsets.YearBegin(1)).dt.year
-        dates_min.name = 'from_year'
-        dates_max = dates_grp.max().dt.year
-        dates_max.name = 'to_year'
-        dates4 = pd.concat([dates_min, dates_max], axis=1)
+        # dates2a = dates2.resample('Y').sum()
+        # dates3 = (dates2a.cumsum()//100000).reset_index()
+        # dates_grp = dates3.groupby('val')['year']
+        # dates_min = (dates_grp.min() - pd.offsets.YearBegin(1)).dt.year
+        # dates_min.name = 'from_year'
+        # dates_max = dates_grp.max().dt.year
+        # dates_max.name = 'to_year'
+        # dates4 = pd.concat([dates_min, dates_max], axis=1)
 
         ## Create requests
 
