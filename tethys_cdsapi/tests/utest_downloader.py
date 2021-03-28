@@ -32,10 +32,10 @@ bbox = [-34.3, 166.3, -47.3, 178.6]
 product = 'reanalysis-era5-land'
 save_path = '/media/sdb1/Data/ecmwf/era5-land'
 
-ds2 = xr.open_dataset(os.path.join(save_path, 'example_data1.nc'))
+ds2 = xr.open_dataset(os.path.join(save_path, '2m_temperature_1981-1991_reanalysis-era5-land.nc'))
 
 
-self = Downloader(url, key, save_path)
+# self = Downloader(url, key, save_path)
 
 
 
