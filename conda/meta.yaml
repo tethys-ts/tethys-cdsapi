@@ -37,7 +37,7 @@ requirements:
   run:
     - python=3.8
     - tethys-utils
-    - xarray=0.16.2
+    - xarray
     - netcdf4
     - pandas
     - cdsapi
