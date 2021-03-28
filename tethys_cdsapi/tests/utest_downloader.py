@@ -8,6 +8,7 @@ Created on Sun Mar 28 16:54:02 2021
 import os
 import yaml
 import xarray as xr
+from tethys_cdsapi import Downloader
 
 #######################################################
 ### Testing
