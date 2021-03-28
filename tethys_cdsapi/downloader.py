@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from multiprocessing.pool import ThreadPool, Pool
 import cdsapi
+import requests
 import urllib3
 urllib3.disable_warnings()
 
@@ -110,7 +111,11 @@ class Downloader(object):
         else:
             raise TypeError('save_path must be a str.')
 
-        client = cdsapi.Client(url=url, key=key)
+        sess = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(pool_connections=32, pool_maxsize=32)
+        sess.mount('https://', adapter)
+
+        client = cdsapi.Client(url=url, key=key, session=sess)
 
         setattr(self, 'client', client)
         setattr(self, 'available_parameters', available_parameters)

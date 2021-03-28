@@ -101,7 +101,7 @@ c = cdsapi.Client()
 ds1 = xr.open_dataset('download.nc')
 ds2 = xr.open_dataset('download2.nc')
 
-ds3 = ds2.tp.sel(time=slice('2020-01-02', '2020-01-02'))
+ds3 = ds2.t2m.sel(time=slice('1991-01-02', '1991-01-02'))
 
 ds3.plot(x='longitude', y='latitude', col='time', col_wrap=3)
 
