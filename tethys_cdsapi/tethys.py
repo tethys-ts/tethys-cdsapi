@@ -9,8 +9,8 @@ import os
 import xarray as xr
 import pandas as pd
 import numpy as np
-# from tethys_cdsapi import virtual_parameters as vp
-import virtual_parameters as vp
+from tethys_cdsapi import virtual_parameters as vp
+# import virtual_parameters as vp
 import copy
 import tethys_utils as tu
 
