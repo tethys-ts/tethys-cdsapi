@@ -118,7 +118,7 @@ class Processor(object):
         return res2
 
 
-    def build_dataset(self, parameter_code, owner, product_code, data_license, attribution='Generated using Copernicus Climate Change Service Information 2021', method='simulation', result_type="time_series_grid_simulation"):
+    def build_dataset(self, parameter_code, owner='ECMWF', product_code='reanalysis-era5-land', data_license='https://apps.ecmwf.int/datasets/licences/copernicus/', attribution='Generated using Copernicus Climate Change Service Information 2021', method='simulation', result_type="time_series_grid_simulation"):
         """
 
         """
