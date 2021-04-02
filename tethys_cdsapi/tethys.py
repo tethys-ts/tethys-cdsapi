@@ -61,6 +61,8 @@ class Processor(object):
         alt4 = xr.where(alt3 < 0, 0, alt3)
         xr1.coords['altitude'] = alt4
 
+        xr1 = xr1.rename({'longitude': 'lon', 'latitude': 'lat'})
+
         ## Determine frequency interval
         freq = xr1['time'][:5].to_index()[:5].inferred_freq
 
@@ -108,7 +110,7 @@ class Processor(object):
 
         res1.name = self.param_dataset['parameter']
         if station_id_index:
-            res2 = res1.stack(id=['longitude', 'latitude']).set_index(id='station_id').rename(id='station_id').copy()
+            res2 = res1.stack(id=['lon', 'lat']).set_index(id='station_id').rename(id='station_id').copy()
         else:
             res2 = res1.copy()
 
@@ -211,7 +213,7 @@ class Processor(object):
             df1 = data2.drop(['lat', 'lon', 'altitude', 'station_id']).to_dataframe().reset_index()
             df2 = df1.drop_duplicates('time', keep='first')
 
-            tu.prepare_results(data_dict, [ds2], stn_data, df2, max_run_date_key,  other_closed='left', discrete=False)
+            tu.prepare_results(data_dict, [ds2], stn_data, df2, max_run_date_key, other_closed='left', discrete=False)
 
         setattr(self, 'data_dict', data_dict)
         setattr(self, 'run_date_dict', run_date_dict)
@@ -248,4 +250,4 @@ class Processor(object):
         ### Aggregate all datasets for the bucket
         ds_all = tu.put_remote_agg_datasets(s3, remote['bucket'], threads)
 
-        print('--Success!')
+        print('Finished updating the stations and datasets!')
