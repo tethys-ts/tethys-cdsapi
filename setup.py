@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 name = 'tethys-cdsapi'
 main_package = 'tethys_cdsapi'
 # datasets = 'datasets/time_series'
-version = '0.0.14'
+version = '0.0.15'
 descrip = 'utilities for downloading and processing CDS data for Tethys'
 
 # The below code is for readthedocs. To have sphinx/readthedocs interact with
@@ -155,9 +155,9 @@ setup(
     #
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
-    # package_data={  # Optional
-    #     main_package: ['*.yml', 'wrf_mappings.csv'],
-    # },
+    package_data={  # Optional
+        main_package: ['*.yml', 'era5_mappings.csv'],
+    },
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
