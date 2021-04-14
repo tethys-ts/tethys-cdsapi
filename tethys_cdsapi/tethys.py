@@ -12,10 +12,10 @@ import pandas as pd
 import numpy as np
 from tethys_cdsapi import virtual_parameters as vp
 # import virtual_parameters as vp
-import copy
+# import copy
 import tethys_utils as tu
-from multiprocessing.pool import ThreadPool, Pool
-# from tethys_cdsapi.utils import param_file_mappings
+# from multiprocessing.pool import ThreadPool, Pool
+from tethys_cdsapi.utils import param_file_mappings
 
 ##############################################
 ### Parameters
@@ -268,8 +268,8 @@ class Processor(object):
             df1 = data3.drop(['lat', 'lon', 'altitude', 'station_id']).to_dataframe().reset_index()
             df2 = df1.drop_duplicates('time', keep='first').dropna()
 
-            # data3.close()
-            # del data3
+            data3.close()
+            del data3
 
             if not df2.empty:
                 tu.prepare_results(data_dict, [ds2], stn_data, df2, max_run_date_key, other_closed='left', discrete=False)

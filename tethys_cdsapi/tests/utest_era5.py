@@ -53,6 +53,7 @@ ds1 = self.build_dataset()
 # data1 = self.get_results()
 self.package_results()
 # self = Downloader(url, key, save_path)
+self.save_results(4,
 
 
 
