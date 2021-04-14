@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 name = 'tethys-cdsapi'
 main_package = 'tethys_cdsapi'
 # datasets = 'datasets/time_series'
-version = '0.0.16'
+version = '0.0.17'
 descrip = 'utilities for downloading and processing CDS data for Tethys'
 
 # The below code is for readthedocs. To have sphinx/readthedocs interact with

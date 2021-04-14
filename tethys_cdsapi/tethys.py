@@ -60,47 +60,81 @@ class Processor(object):
         nc_list2.sort()
 
         # xr1 = xr.open_mfdataset(nc_list2, parallel=True, chunks={'time': 8760})
-        # xr1 = xr.open_mfdataset(nc_list2, concat_dim="time", data_vars='minimal', coords='minimal', compat='override', decode_cf=False)
-        # xr1 = xr.open_mfdataset(nc_list2, chunks={'time': 1})
-        # xr1 = xr.open_dataset(nc_list2[0])
-        # xr1 = xr.open_mfdataset(nc_list2, chunks={'time': 8760, 'longitude': 1, 'latitude': 1})
+        # xr1 = xr.open_mfdataset(nc_list2, concat_dim="time", data_vars='minimal', coords='minimal', compat='override')
+        # xr1 = xr.open_mfdataset(nc_list2, chunks={'time': 1}, concat_dim="time", data_vars='minimal', coords='minimal', compat='override')
+        # xr1 = xr.open_mfdataset(nc_list2)
+        xr1 = xr.open_mfdataset(nc_list2, chunks={'longitude': 1, 'latitude': 1})
         # d1 = xr1.sel(longitude=166.3, latitude=-34.3)
         # d2 = d1.load()
 
+        lat = xr1['latitude'].values
+        lon = xr1['longitude'].values
+
+        lon1, lat1 = np.meshgrid(lon, lat)
+
+        def make_stn_id(x, y):
+            stn_id = tu.assign_station_id(tu.create_geometry([x, y]))
+            return stn_id
+
+        vfunc = np.vectorize(make_stn_id)
+        stn_ids = vfunc(lon1, lat1)
+
+        xr1.coords['station_id'] = (('latitude', 'longitude'), stn_ids)
+
+        ## Altitude
+        alt1 = xr.open_mfdataset(os.path.join(data_path, 'geo_*.nc'))
+        alt2 = alt1.squeeze('time').drop('time').sel(longitude=lon, latitude=lat).load()
+        alt3 = alt2['z'] / 9.80665
+        alt3.name = 'altitude'
+        alt4 = xr.where(alt3 < 0, 0, alt3)
+        xr1.coords['altitude'] = alt4
+
+        xr1 = xr1.rename({'longitude': 'lon', 'latitude': 'lat'})
+        xr1.coords['height'] = map1['height']
+
+        data1 = xr1
+
         ### Iterate through the files
-        xr_list = []
-        for nc_file in nc_list2:
-            xr1 = xr.open_dataset(nc_file)
-            ### Pre-process the station data
-            ## Station_ids
-            lat = xr1['latitude'].values
-            lon = xr1['longitude'].values
+        # xr_m_list = []
+        # for nc_files in nc_list1:
+        #     print(nc_files)
 
-            lon1, lat1 = np.meshgrid(lon, lat)
+        #     f2 = glob.glob(nc_files)
 
-            def make_stn_id(x, y):
-                stn_id = tu.assign_station_id(tu.create_geometry([x, y]))
-                return stn_id
+        #     xr_list = []
+        #     for nc_file in f2:
 
-            vfunc = np.vectorize(make_stn_id)
-            stn_ids = vfunc(lon1, lat1)
+        #         xr1 = xr.open_dataset(nc_file)
+        #         ### Pre-process the station data
+        #         ## Station_ids
+        #         lat = xr1['latitude'].values
+        #         lon = xr1['longitude'].values
 
-            xr1.coords['station_id'] = (('latitude', 'longitude'), stn_ids)
+        #         lon1, lat1 = np.meshgrid(lon, lat)
 
-            ## Altitude
-            alt1 = xr.open_mfdataset(os.path.join(data_path, 'geo_*.nc'))
-            alt2 = alt1.squeeze('time').drop('time').sel(longitude=lon, latitude=lat).load()
-            alt3 = alt2['z'] / 9.80665
-            alt3.name = 'altitude'
-            alt4 = xr.where(alt3 < 0, 0, alt3)
-            xr1.coords['altitude'] = alt4
+        #         def make_stn_id(x, y):
+        #             stn_id = tu.assign_station_id(tu.create_geometry([x, y]))
+        #             return stn_id
 
-            xr1 = xr1.rename({'longitude': 'lon', 'latitude': 'lat'})
-            xr1.coords['height'] = map1['height']
+        #         vfunc = np.vectorize(make_stn_id)
+        #         stn_ids = vfunc(lon1, lat1)
 
-            # xr2 = self.get_results(xr1, map1, vp, False)
+        #         xr1.coords['station_id'] = (('latitude', 'longitude'), stn_ids)
 
-            xr_list.append(xr1)
+        #         ## Altitude
+        #         alt1 = xr.open_mfdataset(os.path.join(data_path, 'geo_*.nc'))
+        #         alt2 = alt1.squeeze('time').drop('time').sel(longitude=lon, latitude=lat).load()
+        #         alt3 = alt2['z'] / 9.80665
+        #         alt3.name = 'altitude'
+        #         alt4 = xr.where(alt3 < 0, 0, alt3)
+        #         xr1.coords['altitude'] = alt4
+
+        #         xr1 = xr1.rename({'longitude': 'lon', 'latitude': 'lat'})
+        #         xr1.coords['height'] = map1['height']
+
+        #         # xr2 = self.get_results(xr1, map1, vp, False)
+
+        #         xr_list.append(xr1)
 
         # d1 = xr1.sel(lon=166.3, lat=-34.3)
         # d2 = d1.load()
@@ -112,8 +146,8 @@ class Processor(object):
             raise ValueError('The time frequency could not be determined from the netcdf file.')
 
         ### Set attrs
-        # setattr(self, 'data', xr1)
-        setattr(self, 'data_list', xr_list)
+        setattr(self, 'data', xr1)
+        # setattr(self, 'data_list', xr_list)
         # setattr(self, 'mappings', mappings)
         setattr(self, 'param_map', map1)
         setattr(self, 'datasets', dsb)
@@ -209,7 +243,8 @@ class Processor(object):
         #     data1 = self.get_results().copy()
         # else:
         #     data1 = self.param_data.copy()
-        data1 = self.data_list
+        # data1 = self.data_list
+        data1 = self.data.copy()
 
         map1 = self.param_map.copy()
         # data1['height'] = map1['height']
@@ -232,7 +267,8 @@ class Processor(object):
         data_dict = {ds_id: []}
 
         ## Prepare data
-        t2 = data1[0].isel(time=10)
+        # t2 = data1[0].isel(time=10)
+        t2 = data1.isel(time=10)
         var = list(t2.data_vars)[0]
         stns = t2[var].to_dataframe().dropna().drop([var, 'time', 'height'], axis=1).reset_index()
         # stns = data1[0].station_id.to_dataframe().reset_index().iloc[:, :-1]
@@ -257,13 +293,16 @@ class Processor(object):
 
             stn_data = {'geometry': geo1, 'altitude': alt, 'station_id': stn_id, 'virtual_station': True}
 
-            d_list = []
-            for data in data1:
-                d2 = data.sel(lat=lat, lon=lon).copy().load()
-                data2 = get_results(d2, map1, vp)
-                d_list.append(data2)
+            d2 = data1.sel(lat=lat, lon=lon).copy().load()
+            data3 = get_results(d2, map1, vp)
 
-            data3 = xr.concat(d_list, dim='time')
+            # d_list = []
+            # for data in data1:
+            #     d2 = data.sel(lat=lat, lon=lon).copy().load()
+            #     data2 = get_results(d2, map1, vp)
+            #     d_list.append(data2)
+
+            # data3 = xr.concat(d_list, dim='time')
 
             df1 = data3.drop(['lat', 'lon', 'altitude', 'station_id']).to_dataframe().reset_index()
             df2 = df1.drop_duplicates('time', keep='first').dropna()

@@ -25,6 +25,7 @@ source = param['source']
 
 data_path = '/media/sdb1/Data/ecmwf/era5-land'
 parameter_code = 'temp_at_2'
+parameter_code = 'relative_humidity_at_2'
 
 # parameters = '2m_temperature'
 # from_date = '1981-01-01'
