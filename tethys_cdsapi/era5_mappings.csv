@@ -5,9 +5,11 @@ snow_at_0,calc_snow0,sf,SNOWNC,snow_depth,atmosphere,cumulative,0,mm,thickness_o
 runoff_at_0,calc_runoff0,sro,SFROFF,surface_runoff,waterway,cumulative,0,mm,surface_runoff_amount,0.1,,int16,-9999,0,900
 recharge_at_0,calc_recharge0,ssro,UDROFF,recharge_groundwater,groundwater,cumulative,0,mm,subsurface_runoff_amount,0.1,,int16,-9999,0,900
 pressure_at_0,calc_surface_pressure,sp,PSFC,barometric_pressure,atmosphere,mean,0,hPa,air_pressure,0.01,-1000,int16,-9999,800,1090
-shortwave_rad_at_0,,ssr,SWDOWN,radiation_incoming_shortwave,atmosphere,cumulative,0,W/m^2,surface_downwelling_shortwave_flux_in_air,0.1,,int16,-9999,0,900
-longwave_rad_at_0,,str,GLW,radiation_incoming_longwave,atmosphere,cumulative,0,W/m^2,surface_downwelling_longwave_flux_in_air,0.1,,int16,-9999,0,900
-heat_flux_at_0,,slhf,HFX,ground_heat_flux,pedosphere,cumulative,0,W/m^2,upward_heat_flux_at_ground_level_in_soil,0.1,,int16,-9999,0,900
+shortwave_rad_at_0,calc_shortwave0,ssr,SWDOWN,radiation_incoming_shortwave,atmosphere,cumulative,0,W/m^2,surface_downwelling_shortwave_flux_in_air,0.1,,int16,-9999,0,900
+longwave_rad_at_0,calc_longwave0,str,GLW,radiation_incoming_longwave,atmosphere,cumulative,0,W/m^2,surface_downwelling_longwave_flux_in_air,0.1,,int16,-9999,0,900
+heat_flux_at_0,calc_heat_flux0,slhf,HFX,ground_heat_flux,pedosphere,cumulative,0,W/m^2,upward_heat_flux_at_ground_level_in_soil,0.1,,int16,-9999,0,900
 relative_humidity_at_2,calc_rh2,rh2,RH2,relative_humidity,atmosphere,mean,2,m^3/m^3,relative_humidity,0.01,,int16,-9999,0,99
 wind_speed_at_2,calc_wind_speed,ws2,WS2,wind_speed,atmosphere,mean,2,m/s,wind_speed,0.01,,int16,-9999,0,200
-reference_et,calc_eto,ETo,ETo,reference_et,atmosphere,cumulative,0,mm,water_evapotranspiration_flux,0.1,,int16,-9999,,
+reference_et_at_0,calc_eto,eto,ETo,reference_et,atmosphere,cumulative,0,mm,water_evapotranspiration_flux,0.1,,int16,-9999,,
+pet_at_0,calc_pet,pev,PEV,potential_et,atmosphere,cumulative,0,mm,water_evapotranspiration_flux,0.1,,int16,,,
+evaporation_at_0,calc_evap,e,EVAP,evaporation,atmosphere,cumulative,0,mm,lwe_thickness_of_water_evaporation_amount,0.1,,int16,,,

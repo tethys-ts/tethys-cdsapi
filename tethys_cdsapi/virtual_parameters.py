@@ -202,6 +202,32 @@ def calc_heat_flux0(wrf_xr):
     return ds2
 
 
+def calc_pet(wrf_xr):
+    """
+
+    """
+    ## Assign variables
+    ds1 = wrf_xr['pev']
+
+    ## Convert from accumultion to cumultive
+    ds2 = fix_accum(ds1)
+
+    return ds2
+
+
+def calc_evap(wrf_xr):
+    """
+
+    """
+    ## Assign variables
+    ds1 = wrf_xr['e']
+
+    ## Convert from accumultion to cumultive
+    ds2 = fix_accum(ds1)
+
+    return ds2
+
+
 def calc_eto(wrf_xr):
     """
 

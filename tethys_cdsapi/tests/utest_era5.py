@@ -23,6 +23,9 @@ source = param['source']
 # url = source['url_endpoint']
 # key = source['key']
 
+data_path = '/media/sdb1/Data/ecmwf/era5-land'
+parameter_code = 'temp_at_2'
+
 # parameters = '2m_temperature'
 # from_date = '1981-01-01'
 # to_date = '2020-12-01'
@@ -45,9 +48,10 @@ geopotential_path = os.path.join(save_path, geop_file)
 ds2 = xr.open_dataset(os.path.join(save_path, '2m_temperature_1981-1991_reanalysis-era5-land.nc'))
 ds2 = xr.open_dataset(os.path.join(save_path, 'example_data1.nc'))
 
-self = Processor(nc, geopotential_path)
-ds1 = self.build_dataset(parameter_code, owner, product_code, data_license, attribution)
-data1 = self.get_results()
+self = Processor(data_path, parameter_code)
+ds1 = self.build_dataset()
+# data1 = self.get_results()
+self.package_results()
 # self = Downloader(url, key, save_path)
 
 

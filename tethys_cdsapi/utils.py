@@ -37,7 +37,21 @@ available_parameters = {'reanalysis-era5-land': [
             'volumetric_soil_water_layer_3', 'volumetric_soil_water_layer_4',
         ]}
 
-
+param_file_mappings = {'temp_at_2': ['2m_temperature_*.nc'],
+                       'precip_at_0': ['total_precipitation_*.nc'],
+                       'snow_at_0': ['snowfall_*.nc'],
+                       'runoff_at_0': ['surface_runoff_*.nc'],
+                       'recharge_at_0': ['sub_surface_runoff_*.nc'],
+                       'pressure_at_0': ['surface_pressure_*.nc'],
+                       'shortwave_rad_at_0': ['surface_net_solar_radiation_*.nc'],
+                       'longwave_rad_at_0': ['surface_net_thermal_radiation_*.nc'],
+                       'heat_flux_at_0': ['surface_latent_heat_flux_*.nc'],
+                       'relative_humidity_at_2': ['2m_temperature_*.nc', '2m_dewpoint_temperature_*.nc'],
+                       'wind_speed_at_2': ['10m_u_component_of_wind_*.nc', '10m_v_component_of_wind_*.nc'],
+                       'reference_et_at_0': ['2m_temperature_*.nc', '2m_dewpoint_temperature_*.nc', '10m_u_component_of_wind_*.nc', '10m_v_component_of_wind_*.nc', 'surface_net_solar_radiation_*.nc', 'surface_net_thermal_radiation_*.nc', 'surface_latent_heat_flux_*.nc'],
+                       'pet_at_0': ['potential_evaporation_*.nc'],
+                       'evaporation_at_0': ['total_evaporation_*.nc']
+                       }
 
 
 
