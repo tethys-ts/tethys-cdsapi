@@ -1,6 +1,6 @@
 {% set name = "tethys-cdsapi" %}
-{% set version = "0.0.15" %}
-{% set sha256 = "4111accb9cd0c33407a4cc9a277190a38461d948f30dbacf93c7dd50aea817ee" %}
+{% set version = "0.0.16" %}
+{% set sha256 = "a3dd202a7bb95094a181849d616306e78dd9f0f2c971c9dec0633c1ff5fa7be3" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
 #  `openssl sha256 <file name>`.
@@ -41,6 +41,7 @@ requirements:
     - netcdf4
     - pandas
     - cdsapi
+    - dask
 
 test:
   imports:
