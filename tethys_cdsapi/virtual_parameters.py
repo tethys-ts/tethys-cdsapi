@@ -132,7 +132,7 @@ def calc_snow0(wrf_xr):
     ds1 = wrf_xr['sf']
 
     ## Convert from accumultion to cumultive
-    ds2 = fix_accum(ds1)
+    ds2 = fix_accum(ds1) * 1000
 
     return ds2
 
@@ -210,7 +210,7 @@ def calc_pet(wrf_xr):
     ds1 = wrf_xr['pev']
 
     ## Convert from accumultion to cumultive
-    ds2 = fix_accum(ds1)
+    ds2 = fix_accum(ds1) * 1000
 
     return ds2
 
@@ -223,7 +223,7 @@ def calc_evap(wrf_xr):
     ds1 = wrf_xr['e']
 
     ## Convert from accumultion to cumultive
-    ds2 = fix_accum(ds1)
+    ds2 = fix_accum(ds1) * 1000
 
     return ds2
 
