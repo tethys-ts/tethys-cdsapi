@@ -293,7 +293,7 @@ class Processor(object):
 
             stn_data = {'geometry': geo1, 'altitude': alt, 'station_id': stn_id, 'virtual_station': True}
 
-            d2 = data1.sel(lat=lat, lon=lon).copy().load()
+            d2 = data1.sel(lat=lat, lon=lon).copy()
             data3 = get_results(d2, map1, vp)
 
             # d_list = []
