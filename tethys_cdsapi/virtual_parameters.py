@@ -210,7 +210,8 @@ def calc_pet(wrf_xr):
     ds1 = wrf_xr['pev']
 
     ## Convert from accumultion to cumultive
-    ds2 = fix_accum(ds1) * 1000
+    # ds2 = fix_accum(ds1) * 1000
+    ds2 = ds1 * 1000
 
     return ds2
 
@@ -255,5 +256,3 @@ def calc_eto(wrf_xr):
     ETo = (0.408*delta*(R_n - G) + gamma*37/(t2 + 273)*ws2*(e_mean - e_a))/(delta + gamma*(1 + 0.34*ws2))
 
     return ETo
-
-
