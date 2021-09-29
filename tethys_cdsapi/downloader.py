@@ -100,7 +100,7 @@ class Downloader(object):
         setattr(self, 'available_parameters', available_parameters)
 
 
-    def download(self, product, parameters, from_date, to_date, bbox):
+    def download(self, product, parameters, from_date, to_date, bbox, freq_interval='11Y', threads=16):
         """
         The method to do the actual downloading of the files. The current maximum queue limit is 35 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
 
@@ -157,7 +157,7 @@ class Downloader(object):
             raise TypeError('bbox must be a list of 4 floats.')
 
         ## Split dates into download chunks
-        dates1 = pd.date_range(from_date1, to_date1, freq='11Y')
+        dates1 = pd.date_range(from_date1, to_date1, freq=freq_interval)
         dates_min = (dates1 - pd.offsets.YearBegin(1)).year.tolist()
         dates_max = (dates1[1:] - pd.offsets.YearEnd(1)).year.tolist()
         dates_max = dates_max + [to_date1.year]
@@ -193,7 +193,7 @@ class Downloader(object):
                 req_list.append((product, dict1, file_path))
 
         ## Run requests
-        with ThreadPool(32) as pool:
+        with ThreadPool(threads) as pool:
             output = pool.starmap(self.client.retrieve, req_list)
             pool.close()
             pool.join()

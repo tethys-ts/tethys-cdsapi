@@ -1,6 +1,6 @@
 {% set name = "tethys-cdsapi" %}
-{% set version = "0.0.21" %}
-{% set sha256 = "2e557c95701e18e41e65ebd01c7d57385e54d1a1e5781a0d329c7d94cd4c8432" %}
+{% set version = "0.0.22" %}
+{% set sha256 = "c2b5d0b3f43576643f844b1ad8c9049b10b45db00f96d763c3c24d8a150dca60" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
 #  `openssl sha256 <file name>`.
