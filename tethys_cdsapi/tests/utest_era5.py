@@ -26,6 +26,7 @@ source = param['source']
 data_path = '/media/sdb1/Data/ecmwf/era5-land'
 parameter_code = 'temp_at_2'
 parameter_code = 'relative_humidity_at_2'
+parameter_code = 'soil_temp'
 
 # parameters = '2m_temperature'
 # from_date = '1981-01-01'
@@ -39,8 +40,8 @@ data_license = "https://creativecommons.org/licenses/by/4.0/"
 attribution = "Data licensed by the NZ Open Data Consortium"
 
 parameter_code = 'temp_at_2'
-save_path = '/media/sdb1/Data/ecmwf/era5-land'
-nc_files = '2m_temperature_*'
+save_path = '/media/nvme1/data/ecmwf/era5-land'
+nc_files = 'volumetric_soil_water_*.nc'
 nc = os.path.join(save_path, nc_files)
 
 geop_file = 'geo_1279l4_0.1x0.1.grib2_v4_unpack.nc'
@@ -48,6 +49,7 @@ geopotential_path = os.path.join(save_path, geop_file)
 
 ds2 = xr.open_dataset(os.path.join(save_path, '2m_temperature_1981-1991_reanalysis-era5-land.nc'))
 ds2 = xr.open_dataset(os.path.join(save_path, 'example_data1.nc'))
+ds2 = xr.open_mfdataset(nc)
 
 self = Processor(data_path, parameter_code)
 ds1 = self.build_dataset()
