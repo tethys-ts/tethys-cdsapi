@@ -1,6 +1,6 @@
 {% set name = "tethys-cdsapi" %}
-{% set version = "0.0.22" %}
-{% set sha256 = "c2b5d0b3f43576643f844b1ad8c9049b10b45db00f96d763c3c24d8a150dca60" %}
+{% set version = "0.1.0" %}
+# {% set sha256 = "c2b5d0b3f43576643f844b1ad8c9049b10b45db00f96d763c3c24d8a150dca60" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
 #  `openssl sha256 <file name>`.
@@ -17,7 +17,7 @@ source:
   # If getting the source from GitHub remove the line above
   # uncomment the line below and modify as needed
   # url: https://github.com/simplejson/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  # sha256: {{ sha256 }}
 
 build:
   # Uncomment the following line if the package is pure python and the recipe is exactly the same for all platforms.
@@ -35,13 +35,9 @@ requirements:
     - python
     - setuptools
   run:
-    - python=3.8
-    - tethys-utils
-    - xarray
-    - netcdf4
+    - python>=3.8
     - pandas
     - cdsapi
-    - dask
 
 test:
   imports:
@@ -51,7 +47,7 @@ about:
   home: https://github.com/tethys-ts/tethys-cdsapi
   license: Apache License 2.0
   license_family: APACHE
-  summary: 'utilities for downloading and processing CDS data for Tethys'
-  description: 'utilities for downloading and processing CDS data for Tethys'
+  summary: 'utilities for downloading CDS data'
+  description: 'utilities for downloading CDS data'
   doc_url: https://github.com/tethys-ts/tethys-cdsapi
   dev_url: ''
