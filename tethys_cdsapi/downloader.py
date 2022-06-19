@@ -203,6 +203,7 @@ def time_request(from_date1, to_date1):
     else:
         years1 = np.arange(from_year, to_year+1)
         months1 = np.arange(1, 13)
+        days1 = np.arange(1, 32)
 
     days = ['{:02d}'.format(d) for d in days1]
     months = ['{:02d}'.format(m) for m in months1]
