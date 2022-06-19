@@ -13,6 +13,7 @@ import concurrent.futures
 import cdsapi
 import requests
 from time import sleep
+import copy
 import urllib3
 urllib3.disable_warnings()
 
@@ -430,15 +431,16 @@ class CDS(object):
                 dict1['pressure_level'] = [str(p) for p in pressure_levels1]
 
             for i, tdate in enumerate(dates1[1:]):
+                dict2 = copy.deepcopy(dict1)
                 fdate = dates1[i]
                 time_dict = time_request(fdate, tdate)
 
-                dict1.update(time_dict)
+                dict2.update(time_dict)
 
                 file_name = file_naming.format(param=p, from_date=fdate.strftime('%Y%m%d'), to_date=tdate.strftime('%Y%m%d'), product=product)
                 file_path = os.path.join(self.save_path, file_name)
 
-                req_list.append({'name': product, 'request': dict1, 'target': file_path})
+                req_list.append({'name': product, 'request': dict2, 'target': file_path})
 
         ## Run requests
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.threads) as executor:
