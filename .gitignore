@@ -14,3 +14,5 @@ scripts/__pycache__/
 # due to using tox and pytest
 .tox
 .cache
+# tethys_cdsapi/tests/testing.py
+# tethys_cdsapi/tests/utest*.py

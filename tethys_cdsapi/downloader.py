@@ -414,6 +414,10 @@ class CDS(object):
 
         ## Split dates into download chunks
         dates1 = pd.date_range(from_date1, to_date1, freq=freq_interval)
+
+        if dates1.empty:
+            raise ValueError('The frequency interval is too long for the input time period. Use a shorter frequency interval.')
+
         if from_date1 < dates1[0]:
             dates1 = pd.DatetimeIndex([from_date1]).append(dates1)
         if to_date1 > dates1[-1]:
