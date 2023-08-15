@@ -34,7 +34,9 @@ hours = ['00:00', '01:00', '02:00',
         '18:00', '19:00', '20:00',
         '21:00', '22:00', '23:00']
 
-file_naming = '{param}_{from_date}-{to_date}_{product}.nc'
+file_naming = '{param}_{from_date}-{to_date}_{product}.{ext}'
+
+ext_dict = {'netcdf': 'nc', 'grib': 'grib'}
 
 available_variables = {'reanalysis-era5-land': [
             '10m_u_component_of_wind', '10m_v_component_of_wind', '2m_dewpoint_temperature',
@@ -177,6 +179,42 @@ product_types = {'reanalysis-era5-single-levels': [
                 'reanalysis']
     }
 
+### WRF parameters
+
+era5_wrf_products = {
+    'reanalysis-era5-pressure-levels':
+        [
+            'geopotential',
+            'relative_humidity',
+            'temperature',
+            'u_component_of_wind',
+            'v_component_of_wind'
+            ],
+    'reanalysis-era5-single-levels':
+        [
+            '10m_u_component_of_wind',
+            '10m_v_component_of_wind',
+            '2m_dewpoint_temperature',
+            '2m_temperature',
+            'land_sea_mask',
+            'mean_sea_level_pressure',
+            'sea_ice_cover',
+            'sea_surface_temperature',
+            'skin_temperature',
+            'snow_depth',
+            'snow_density',
+            'soil_temperature_level_1',
+            'soil_temperature_level_2',
+            'soil_temperature_level_3',
+            'soil_temperature_level_4',
+            'surface_pressure',
+            'volumetric_soil_water_layer_1',
+            'volumetric_soil_water_layer_2',
+            'volumetric_soil_water_layer_3',
+            'volumetric_soil_water_layer_4'
+            ]
+        }
+
 ########################################
 ### Helper functions
 
@@ -314,7 +352,7 @@ class CDS(object):
         setattr(self, 'threads', threads)
 
 
-    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='10Y', product_types=None, pressure_levels=None):
+    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='10Y', product_types=None, pressure_levels=None, output_format='netcdf'):
         """
         The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
         This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values.
@@ -340,6 +378,8 @@ class CDS(object):
             Some products have product types and if they do they need to be specified. Check the available_product_types object for the available options.
         pressure_levels : int or list of int
             Some products have pressure levels and if they do they need to be specified. Check the available_pressure_levels object for the available options.
+        output_format : str
+            The output format for the file. Must be either netcdf or grib.
 
         Returns
         -------
@@ -382,9 +422,11 @@ class CDS(object):
 
         # Pressure levels
         if product in self.available_pressure_levels:
-            if isinstance(pressure_levels, int):
+            if isinstance(pressure_levels, list):
+                pressure_levels1 = pressure_levels
+            elif isinstance(pressure_levels, int):
                 pressure_levels1 = [pressure_levels]
-            elif not isinstance(pressure_levels, list):
+            else:
                 raise TypeError('The requested product has required pressure_levels, but none have been specified.')
             pl_bool = all([p in self.available_pressure_levels[product] for p in pressure_levels1])
 
@@ -412,6 +454,10 @@ class CDS(object):
         else:
             raise TypeError('bbox must be a list of 4 floats.')
 
+        ## Formats
+        if output_format not in ['netcdf', 'grib']:
+            raise ValueError('output_format must be either netcdf or grib')
+
         ## Split dates into download chunks
         dates1 = pd.date_range(from_date1, to_date1, freq=freq_interval)
 
@@ -426,7 +472,7 @@ class CDS(object):
         ## Create requests
         req_list = []
         for p in params:
-            dict1 = {'format': 'netcdf', 'variable': p, 'area': bbox1}
+            dict1 = {'format': output_format, 'variable': p, 'area': bbox1}
 
             if isinstance(product_types1, list):
                 dict1['product_type'] = product_types1
@@ -441,7 +487,7 @@ class CDS(object):
 
                 dict2.update(time_dict)
 
-                file_name = file_naming.format(param=p, from_date=fdate.strftime('%Y%m%d'), to_date=tdate.strftime('%Y%m%d'), product=product)
+                file_name = file_naming.format(param=p, from_date=fdate.strftime('%Y%m%d'), to_date=tdate.strftime('%Y%m%d'), product=product, ext=ext_dict[output_format])
                 file_path = os.path.join(self.save_path, file_name)
 
                 req_list.append({'name': product, 'request': dict2, 'target': file_path})
