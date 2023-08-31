@@ -5,6 +5,7 @@ Created on Mon Jan 18 10:32:40 2021
 
 @author: mike
 """
+import pathlib
 import os
 import pandas as pd
 import numpy as np
@@ -323,7 +324,7 @@ class CDS(object):
             The endpoint URL provided after registration.
         key: str
             The key provided after registration.
-        save_path : str
+        save_path : str or pathlib.Path
             The path to save the downloaded files.
         threads : int
             The number of simultaneous download/queued requests. Only one request will be processed at one time, but a user can queue many requests. It's unclear if there is a limit to the number of queued requests per user.
@@ -334,8 +335,10 @@ class CDS(object):
         """
         if isinstance(save_path, str):
             setattr(self, 'save_path', save_path)
+        elif isinstance(save_path, pathlib.Path):
+            setattr(self, 'save_path', str(save_path))
         else:
-            raise TypeError('save_path must be a str.')
+            raise TypeError('save_path must be a str or a pathlib.Path.')
 
         sess = requests.Session()
         adapter = requests.adapters.HTTPAdapter(pool_connections=threads, pool_maxsize=threads)
@@ -355,7 +358,7 @@ class CDS(object):
     def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='10Y', product_types=None, pressure_levels=None, output_format='netcdf'):
         """
         The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
-        This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values.
+        This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
 
         The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
         This extraction resolution is due to the limitations of the cdsapi.

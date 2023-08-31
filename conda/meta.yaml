@@ -1,5 +1,6 @@
-{% set name = "tethys-cdsapi" %}
-{% set version = "0.1.5" %}
+{% set dist_name = "tethys-cdsapi" %}
+{% set package_name = "tethys_cdsapi" %}
+{% set version = "0.1.6" %}
 # {% set sha256 = "c2b5d0b3f43576643f844b1ad8c9049b10b45db00f96d763c3c24d8a150dca60" %}
 
 # sha256 is the prefered checksum -- you can get it for a file with:
@@ -8,12 +9,12 @@
 #  `conda install openssl -c conda-forge``
 
 package:
-  name: {{ name|lower }}
+  name: {{ dist_name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  fn: {{ dist_name }}-{{ version }}.tar.gz
+  url: https://pypi.io/packages/source/{{ dist_name[0] }}/{{ dist_name }}/{{ package_name }}-{{ version }}.tar.gz
   # If getting the source from GitHub remove the line above
   # uncomment the line below and modify as needed
   # url: https://github.com/simplejson/{{ name }}/archive/{{ version }}.tar.gz
@@ -34,20 +35,23 @@ requirements:
   build:
     - python
     - setuptools
+    - hatchling
   run:
-    - python>=3.8
-    - pandas
+    - python >=3.8
+    - pandas >=1
     - cdsapi
+    - requests
+    - urllib3
 
 test:
   imports:
-    - tethys_cdsapi
+    - {{ package_name }}
 
 about:
-  home: https://github.com/tethys-ts/tethys-cdsapi
+  home: https://github.com/tethys-ts/{{ package_name }}
   license: Apache License 2.0
   license_family: APACHE
   summary: 'utilities for downloading CDS data'
   description: 'utilities for downloading CDS data'
-  doc_url: https://github.com/tethys-ts/tethys-cdsapi
+  doc_url: https://github.com/tethys-ts/{{ package_name }}
   dev_url: ''

@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 name = 'tethys-cdsapi'
 main_package = 'tethys_cdsapi'
 # datasets = 'datasets/time_series'
-version = '0.1.5'
+version = '0.1.6'
 descrip = 'utilities for downloading and processing CDS data for Tethys'
 
 # The below code is for readthedocs. To have sphinx/readthedocs interact with
@@ -19,7 +19,7 @@ descrip = 'utilities for downloading and processing CDS data for Tethys'
 if os.environ.get('READTHEDOCS', False) == 'True':
     INSTALL_REQUIRES = []
 else:
-    INSTALL_REQUIRES = ['cdsapi', 'pandas']
+    INSTALL_REQUIRES = ['cdsapi', 'pandas>=1']
 
 # Get the long description from the README file
 with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
