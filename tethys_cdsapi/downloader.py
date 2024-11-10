@@ -21,10 +21,10 @@ urllib3.disable_warnings()
 ##############################################
 ### Parameters
 
-y_ints = ['{:d}Y'.format(y) for y in np.arange(1, 12)]
+# y_ints = ['{:d}Y'.format(y) for y in np.arange(1, 12)]
 
 available_freq_intervals = ['1D', 'D', '1M', 'M', 'Y']
-available_freq_intervals.extend(y_ints)
+# available_freq_intervals.extend(y_ints)
 
 hours = ['00:00', '01:00', '02:00',
         '03:00', '04:00', '05:00',
@@ -35,7 +35,7 @@ hours = ['00:00', '01:00', '02:00',
         '18:00', '19:00', '20:00',
         '21:00', '22:00', '23:00']
 
-file_naming = '{param}_{from_date}-{to_date}_{product}.{ext}'
+file_naming = '{param}.{from_date}-{to_date}.{product}.{ext}'
 
 ext_dict = {'netcdf': 'nc', 'grib': 'grib'}
 
@@ -224,7 +224,7 @@ def time_request(from_date1, to_date1):
     """
 
     """
-    from_date1 = from_date1 + pd.DateOffset(days=1)
+    # from_date1 = from_date1 + pd.DateOffset(days=1)
     from_day = from_date1.day
     to_day = to_date1.day
     from_month = from_date1.month
@@ -256,40 +256,67 @@ def download_file(client, name, request, target):
     """
 
     """
-    r = client.retrieve(name, request)
+    # r = client.retrieve(name, request)
 
-    retries = 5
-    while True:
-        sleep(300)
-        r.update()
-        reply = r.reply
-        # r.info("Request ID: %s, state: %s" % (reply["request_id"], reply["state"]))
-        # print("Request ID: %s, state: %s" % (reply["request_id"], reply["state"]))
+    # retries = 5
+    # while True:
+    #     sleep(60)
+    #     # r.update()
+    #     reply = r.reply
+    #     # r.info("Request ID: %s, state: %s" % (reply["request_id"], reply["state"]))
+    #     print("Request ID: %s, state: %s" % (reply["request_id"], reply["state"]))
 
-        if reply["state"] == "completed":
-            break
-        # elif reply["state"] in ("queued", "running"):
-        #     # r.info("Request ID: %s, sleep: %s", reply["request_id"], sleep)
-        #     sleep(300)
-        elif reply["state"] in ("failed",):
-            r.error("Message: %s", reply["error"].get("message"))
-            r.error("Reason:  %s", reply["error"].get("reason"))
+    #     if reply["state"] in ("completed", 'successful'):
+    #         break
+    #     # elif reply["state"] in ("queued", "running"):
+    #     #     # r.info("Request ID: %s, sleep: %s", reply["request_id"], sleep)
+    #     #     sleep(300)
+    #     elif reply["state"] in ("failed",):
+    #         r.error("Message: %s", reply["error"].get("message"))
+    #         r.error("Reason:  %s", reply["error"].get("reason"))
 
-            print('Request failed with message: {msg}; and reason: {reason}'.format(msg=reply["error"].get("message"), reason=reply["error"].get("reason")))
+    #         print('Request failed with message: {msg}; and reason: {reason}'.format(msg=reply["error"].get("message"), reason=reply["error"].get("reason")))
 
-            ## Remove request
-            r.delete()
+    #         ## Remove request
+    #         r.delete()
 
-            if retries > 0:
-                ## try again
-                sleep(60)
-                r = client.retrieve(name, request)
-            else:
-                raise Exception('Request failed with message: {msg}; and reason: {reason}'.format(msg=reply["error"].get("message"), reason=reply["error"].get("reason")))
+    #         if retries > 0:
+    #             ## try again
+    #             sleep(60)
+    #             r = client.retrieve(name, request)
+    #         else:
+    #             raise Exception('Request failed with message: {msg}; and reason: {reason}'.format(msg=reply["error"].get("message"), reason=reply["error"].get("reason")))
 
-    r.download(target)
+    # r.download(target)
+
+    client.retrieve(name, request, target)
 
     return target
+
+
+class Downloader:
+    """
+
+    """
+    def __init__(self, client, product, request, target):
+        """
+
+        """
+        self.client = client
+        self.product = product
+        self.request = request
+        self.target = target
+
+
+    def download(self):
+        """
+
+        """
+        # target = download_file(self.client, self.product, self.request, self.target)
+        self.client.retrieve(self.product, self.request, self.target)
+
+        return self.target
+
 
 
 ########################################
@@ -355,41 +382,10 @@ class CDS(object):
         setattr(self, 'threads', threads)
 
 
-    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='10Y', product_types=None, pressure_levels=None, output_format='netcdf'):
+    def _processing(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf'):
         """
-        The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
-        This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
 
-        The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
-        This extraction resolution is due to the limitations of the cdsapi.
-
-        Parameters
-        ----------
-        product : str
-            The requested product. Look at the available_parameters keys for all options.
-        variables : str or list of str
-            The requested variables. Look at the available_variables values for all options.
-        from_date : str or Timestamp
-            The start date of the extraction.
-        to_date : str or Timestamp
-            The end date of the extraction.
-        bbox : list of float
-            The bounding box of lat and lon for the requested area. It must be in the order of [upper lat, left lon, lower lat, right lon].
-        freq_interval : str
-            Pandas frequency string representing the time interval of each request. The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
-        product_types : str or list of str
-            Some products have product types and if they do they need to be specified. Check the available_product_types object for the available options.
-        pressure_levels : int or list of int
-            Some products have pressure levels and if they do they need to be specified. Check the available_pressure_levels object for the available options.
-        output_format : str
-            The output format for the file. Must be either netcdf or grib.
-
-        Returns
-        -------
-        None
         """
-        ## Run checks
-        # Products
         if product not in self.available_variables.keys():
             raise ValueError('product is not available.')
 
@@ -467,15 +463,54 @@ class CDS(object):
         if dates1.empty:
             raise ValueError('The frequency interval is too long for the input time period. Use a shorter frequency interval.')
 
-        if from_date1 < dates1[0]:
-            dates1 = pd.DatetimeIndex([from_date1]).append(dates1)
+        # if from_date1 < dates1[0]:
+        #     dates1 = pd.DatetimeIndex([from_date1]).append(dates1)
         if to_date1 > dates1[-1]:
             dates1 = dates1.append(pd.DatetimeIndex([to_date1]))
 
+        return params, product_types1, bbox1, pressure_levels1, dates1, from_date1
+
+
+    def downloader(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf'):
+        """
+        The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
+        This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
+
+        The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
+        This extraction resolution is due to the limitations of the cdsapi.
+
+        Parameters
+        ----------
+        product : str
+            The requested product. Look at the available_parameters keys for all options.
+        variables : str or list of str
+            The requested variables. Look at the available_variables values for all options.
+        from_date : str or Timestamp
+            The start date of the extraction.
+        to_date : str or Timestamp
+            The end date of the extraction.
+        bbox : list of float
+            The bounding box of lat and lon for the requested area. It must be in the order of [upper lat, left lon, lower lat, right lon].
+        freq_interval : str
+            Pandas frequency string representing the time interval of each request. The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
+        product_types : str or list of str
+            Some products have product types and if they do they need to be specified. Check the available_product_types object for the available options.
+        pressure_levels : int or list of int
+            Some products have pressure levels and if they do they need to be specified. Check the available_pressure_levels object for the available options.
+        output_format : str
+            The output format for the file. Must be either netcdf or grib.
+
+        Returns
+        -------
+        Iterator of Downloaders
+        """
+        ## Get input params
+        params, product_types1, bbox1, pressure_levels1, dates1, from_date1 = self._processing(product, variables, from_date, to_date, bbox, freq_interval, product_types, pressure_levels, output_format)
+
         ## Create requests
-        req_list = []
+        # req_list = []
         for p in params:
-            dict1 = {'format': output_format, 'variable': p, 'area': bbox1}
+            dict1 = {'data_format': output_format, 'variable': p, 'area': bbox1}
 
             if isinstance(product_types1, list):
                 dict1['product_type'] = product_types1
@@ -483,9 +518,97 @@ class CDS(object):
             if isinstance(pressure_levels1, list):
                 dict1['pressure_level'] = [str(p) for p in pressure_levels1]
 
-            for i, tdate in enumerate(dates1[1:]):
+            for i, tdate in enumerate(dates1):
+                if i == 0:
+                    fdate = from_date1
+                else:
+                    fdate = dates1[i-1] + pd.DateOffset(days=1)
+
                 dict2 = copy.deepcopy(dict1)
-                fdate = dates1[i]
+
+                time_dict = time_request(fdate, tdate)
+
+                dict2.update(time_dict)
+
+                file_name = file_naming.format(param=p, from_date=fdate.strftime('%Y%m%d'), to_date=tdate.strftime('%Y%m%d'), product=product, ext=ext_dict[output_format])
+                file_path = os.path.join(self.save_path, file_name)
+
+                # req_list.append({'name': product, 'request': dict2, 'target': file_path})
+                yield Downloader(self.client, product, dict2, file_path)
+
+        ## Run requests
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=self.threads) as executor:
+        #     futures = []
+        #     for req in req_list:
+        #         f = executor.submit(download_file, self.client, req['name'], req['request'], req['target'])
+        #         futures.append(f)
+
+        # runs = concurrent.futures.wait(futures)
+
+        # paths = []
+        # for run in runs[0]:
+        #     paths.append(run.result())
+
+        # print('Finished')
+
+        # return paths
+
+
+    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf'):
+        """
+        The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
+        This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
+
+        The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
+        This extraction resolution is due to the limitations of the cdsapi.
+
+        Parameters
+        ----------
+        product : str
+            The requested product. Look at the available_parameters keys for all options.
+        variables : str or list of str
+            The requested variables. Look at the available_variables values for all options.
+        from_date : str or Timestamp
+            The start date of the extraction.
+        to_date : str or Timestamp
+            The end date of the extraction.
+        bbox : list of float
+            The bounding box of lat and lon for the requested area. It must be in the order of [upper lat, left lon, lower lat, right lon].
+        freq_interval : str
+            Pandas frequency string representing the time interval of each request. The freq_interval can be 1D or D for daily, 1M or M for monthly, or yearly (Y) with up to 11 years (11Y).
+        product_types : str or list of str
+            Some products have product types and if they do they need to be specified. Check the available_product_types object for the available options.
+        pressure_levels : int or list of int
+            Some products have pressure levels and if they do they need to be specified. Check the available_pressure_levels object for the available options.
+        output_format : str
+            The output format for the file. Must be either netcdf or grib.
+
+        Returns
+        -------
+        Paths as strings
+        """
+        ## Get input params
+        params, product_types1, bbox1, pressure_levels1, dates1, from_date1 = self._processing(product, variables, from_date, to_date, bbox, freq_interval, product_types, pressure_levels, output_format)
+
+        ## Create requests
+        req_list = []
+        for p in params:
+            dict1 = {'data_format': output_format, 'variable': p, 'area': bbox1}
+
+            if isinstance(product_types1, list):
+                dict1['product_type'] = product_types1
+
+            if isinstance(pressure_levels1, list):
+                dict1['pressure_level'] = [str(p) for p in pressure_levels1]
+
+            for i, tdate in enumerate(dates1):
+                if i == 0:
+                    fdate = from_date1
+                else:
+                    fdate = dates1[i-1] + pd.DateOffset(days=1)
+
+                dict2 = copy.deepcopy(dict1)
+
                 time_dict = time_request(fdate, tdate)
 
                 dict2.update(time_dict)
@@ -494,6 +617,7 @@ class CDS(object):
                 file_path = os.path.join(self.save_path, file_name)
 
                 req_list.append({'name': product, 'request': dict2, 'target': file_path})
+                # yield Downloader(self.client, product, dict2, file_path)
 
         ## Run requests
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.threads) as executor:
@@ -508,12 +632,9 @@ class CDS(object):
         for run in runs[0]:
             paths.append(run.result())
 
-        print('Finished')
+        # print('Finished')
 
         return paths
-
-
-
 
 
 
