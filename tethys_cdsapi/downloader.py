@@ -13,7 +13,7 @@ from multiprocessing.pool import ThreadPool, Pool
 import concurrent.futures
 import cdsapi
 import requests
-# from time import sleep
+from time import sleep
 import copy
 import urllib3
 urllib3.disable_warnings()
@@ -627,6 +627,7 @@ class CDS(object):
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.threads) as executor:
             futures = []
             for req in req_list:
+                sleep(2)
                 f = executor.submit(download_file, self.client, req['name'], req['request'], req['target'])
                 futures.append(f)
 
