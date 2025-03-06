@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tethys-cdsapi"
-version = '0.2.3'
+dynamic = ["version"]
 description = "utilities for downloading and processing CDS data"
 readme = "README.md"
 license = "Apache-2.0"
@@ -45,3 +45,6 @@ dependencies = [
 include = [
     "/tethys_cdsapi",
 ]
+
+[tool.hatch.version]
+path = "tethys_cdsapi/__init__.py"

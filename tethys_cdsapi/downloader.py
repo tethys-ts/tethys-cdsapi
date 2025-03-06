@@ -13,7 +13,7 @@ from multiprocessing.pool import ThreadPool, Pool
 import concurrent.futures
 import cdsapi
 import requests
-from time import sleep
+# from time import sleep
 import copy
 import urllib3
 urllib3.disable_warnings()
@@ -471,7 +471,7 @@ class CDS(object):
         return params, product_types1, bbox1, pressure_levels1, dates1, from_date1
 
 
-    def downloader(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf'):
+    def downloader(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf', zipped=False):
         """
         The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
         This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
@@ -511,6 +511,8 @@ class CDS(object):
         # req_list = []
         for p in params:
             dict1 = {'data_format': output_format, 'variable': p, 'area': bbox1}
+            if not zipped:
+                dict1['download_format'] = 'unarchived'
 
             if isinstance(product_types1, list):
                 dict1['product_type'] = product_types1
@@ -554,7 +556,7 @@ class CDS(object):
         # return paths
 
 
-    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf'):
+    def download(self, product: str, variables, from_date, to_date, bbox, freq_interval='Y', product_types=None, pressure_levels=None, output_format='netcdf', zipped=False):
         """
         The method to do the actual downloading of the files. The current maximum queue limit is 32 requests per user and this has been set as the number of threads to use. The cdsapi blocks the threads until they finished downloading. This can take a very long time for many large files...make sure this process can run happily without interruption for a while...
         This method does not check to make sure you do not exceede the CDS extraction limit of 120,000 values, so be sure to make your request of a sane size. When in doubt, just reduce the amount per request by lowering the freq_interval.
@@ -594,6 +596,8 @@ class CDS(object):
         req_list = []
         for p in params:
             dict1 = {'data_format': output_format, 'variable': p, 'area': bbox1}
+            if not zipped:
+                dict1['download_format'] = 'unarchived'
 
             if isinstance(product_types1, list):
                 dict1['product_type'] = product_types1
